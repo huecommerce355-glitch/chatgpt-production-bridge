@@ -1,0 +1,56 @@
+openapi: 3.0.3
+info:
+  title: chatgpt-production-bridge
+  version: 1.0.0
+servers:
+  - url: https://bridge.example.internal
+paths:
+  /health:
+    get:
+      security: []
+      responses:
+        '200': {description: Healthy}
+  /v1/strategy/{action}:
+    post:
+      security: [{ApiKeyAuth: []}]
+      parameters:
+        - name: action
+          in: path
+          required: true
+          schema: {type: string, enum: [context, knowledge, adr, handoff]}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/StrategyRequest'}
+      responses:
+        '200':
+          description: Forwarded
+          content: {application/json: {schema: {$ref: '#/components/schemas/StrategyResponse'}}}
+        '401': {description: Missing API key}
+        '403': {description: Boundary or scope denied}
+        '503': {description: API keys not configured}
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  schemas:
+    StrategyRequest:
+      type: object
+      required: [protocol, type, payload]
+      properties:
+        protocol: {type: object, additionalProperties: true}
+        type: {type: string, pattern: '^strategy\\.'}
+        request_id: {type: string}
+        trace_id: {type: string}
+        session_id: {type: string}
+        payload: {type: object, additionalProperties: true}
+    StrategyResponse:
+      type: object
+      properties:
+        status: {type: string}
+        request_id: {type: string}
+        trace_id: {type: string}
+        result: {type: object, additionalProperties: true}
