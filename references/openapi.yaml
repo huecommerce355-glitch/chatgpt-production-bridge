@@ -7,17 +7,66 @@ servers:
 paths:
   /health:
     get:
+      operationId: healthCheck
       security: []
       responses:
         '200': {description: Healthy}
-  /v1/strategy/{action}:
+  /v1/strategy/context:
     post:
+      operationId: getStrategyContext
+      description: Forward a strategy.context.request message to the strategy gateway.
       security: [{ApiKeyAuth: []}]
-      parameters:
-        - name: action
-          in: path
-          required: true
-          schema: {type: string, enum: [context, knowledge, adr, handoff]}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/StrategyRequest'}
+      responses:
+        '200':
+          description: Forwarded
+          content: {application/json: {schema: {$ref: '#/components/schemas/StrategyResponse'}}}
+        '401': {description: Missing API key}
+        '403': {description: Boundary or scope denied}
+        '503': {description: API keys not configured}
+  /v1/strategy/knowledge:
+    post:
+      operationId: readStrategyKnowledge
+      description: Forward a strategy.knowledge.read message to the strategy gateway.
+      security: [{ApiKeyAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/StrategyRequest'}
+      responses:
+        '200':
+          description: Forwarded
+          content: {application/json: {schema: {$ref: '#/components/schemas/StrategyResponse'}}}
+        '401': {description: Missing API key}
+        '403': {description: Boundary or scope denied}
+        '503': {description: API keys not configured}
+  /v1/strategy/adr:
+    post:
+      operationId: proposeStrategyAdr
+      description: Forward a strategy.adr.propose message to the strategy gateway.
+      security: [{ApiKeyAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/StrategyRequest'}
+      responses:
+        '200':
+          description: Forwarded
+          content: {application/json: {schema: {$ref: '#/components/schemas/StrategyResponse'}}}
+        '401': {description: Missing API key}
+        '403': {description: Boundary or scope denied}
+        '503': {description: API keys not configured}
+  /v1/strategy/handoff:
+    post:
+      operationId: executeStrategyHandoff
+      description: Forward a strategy.handoff message to the strategy gateway.
+      security: [{ApiKeyAuth: []}]
       requestBody:
         required: true
         content:
