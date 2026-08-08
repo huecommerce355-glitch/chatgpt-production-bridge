@@ -14,9 +14,15 @@ Schema:
   "request_id": "request correlation id",
   "trace_id": "trace id or null",
   "status": 200,
-  "elapsed_ms": 0.123
+  "elapsed_ms": 0.123,
+  "stage": "completed",
+  "downstream_url": "http://127.0.0.1:8080/strategy/context"
 }
 ```
+
+`stage` is one of `received`, `forwarded`, `completed`, or `failed`. The
+`downstream_url` field is present for relay stages when a downstream URL is
+configured; secrets are never written to the audit event.
 
 Example:
 
